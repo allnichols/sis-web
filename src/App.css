@@ -1,42 +1,116 @@
+:root {
+  --bg-start: #f3f7ff;
+  --bg-end: #eefcf6;
+  --text: #12202f;
+  --muted: #4d6073;
+  --accent: #0f8a78;
+  --accent-hover: #0a6c5f;
+  --danger: #c22539;
+  --panel: #ffffff;
+  --border: #dce7f3;
+}
+
 #root {
-  max-width: 1280px;
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  color: var(--text);
+  background: linear-gradient(150deg, var(--bg-start), var(--bg-end));
+  padding: 3rem 1.5rem;
+}
+
+.app-header {
+  margin: 0 auto 1rem;
+  max-width: 720px;
+}
+
+.app-kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.app-header h1 {
+  margin: 0.4rem 0 0;
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+}
+
+.app-content {
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: 720px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 14px 36px rgba(12, 28, 42, 0.08);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.panel h2 {
+  margin-top: 0;
+}
+
+.panel-copy {
+  margin-top: 0.5rem;
+  color: var(--muted);
+}
+
+.onboarding-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.1rem;
+}
+
+.onboarding-form label {
+  font-weight: 600;
+}
+
+.onboarding-form input {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  font-size: 1rem;
+}
+
+.onboarding-form button {
+  justify-self: start;
+  background: var(--accent);
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.onboarding-form button:hover {
+  background: var(--accent-hover);
+}
+
+.error-message {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+.back-link {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 1.25rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  .panel {
+    padding: 1rem;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
