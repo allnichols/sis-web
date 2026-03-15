@@ -1,17 +1,13 @@
-import { useState, type FormEvent } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Container, Stepper, Button, Group, Box, TextInput  } from '@mantine/core';
+import { Container, Button, Box, TextInput  } from '@mantine/core';
 import { isEmail, hasLength, useForm, } from '@mantine/form';
-import InstitutionForm from '../../features/onboarding/components/InstitutionForm';
 import type { OnboardingFormValues } from '../../features/onboarding/components/types';
 
 export function OnboardingPage() {
-  const [activeStep, setActiveStep] = useState(0);
   const navigate = useNavigate({ from: '/' });
   const form = useForm<OnboardingFormValues>({
     mode: 'uncontrolled',
     initialValues: {
-      
       institution_address: '',
       institution_email: '',
       institution_phone_number: '',
@@ -34,6 +30,12 @@ export function OnboardingPage() {
         form.getValues().institution_address.trim() === '' || 
         form.getValues().institution_phone_number.trim() === '';
 
+  const submitForm = () => {
+    // Here you would typically send the form data to your backend API
+    // For this example, we'll just navigate to the dashboard
+    navigate({ to: '/dashboard' });
+  };
+
   return (
     <Container size="md" mt="xl">
       <Box bd={1}  style={{
@@ -42,7 +44,7 @@ export function OnboardingPage() {
         padding: '2rem',
         backgroundColor: '#fff',
       }}>
-           <form>
+      <form onSubmit={submitForm}>
         <TextInput 
           label="Institution Name"
           key={form.key('institution_name')}

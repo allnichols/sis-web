@@ -1,4 +1,4 @@
-import { Box, Container, TextInput, PasswordInput, Button } from '@mantine/core';
+import { Box, Container, TextInput, PasswordInput, Button, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from '@tanstack/react-router';
 import { isEmail, hasLength, useForm } from '@mantine/form';
@@ -30,6 +30,7 @@ export default function SignupPage() {
         backgroundColor: '#fff',
       }}>
             <form>
+                <Stack>
                 <TextInput 
                     label="Email"
                     key={form.key('email')}
@@ -52,6 +53,7 @@ export default function SignupPage() {
                 <Button fullWidth mt="md" onClick={() => navigate({ to: '/onboarding' })}>
                     Sign Up
                 </Button>
+                </Stack>
             </form>
         </Box>
     </Container>
