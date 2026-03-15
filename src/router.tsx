@@ -3,8 +3,15 @@ import { RootLayout } from './routes/__root'
 import { OnboardingPage } from './routes/onboarding'
 import { DashboardLayout } from './routes/dashboard/layout'
 import { DashboardPage, validateDashboardSearch } from './routes/dashboard/dashboard'
+import SignupPage from './routes/auth/signup'
 
 const rootRoute = createRootRoute({ component: RootLayout })
+
+const signupRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/signup',
+  component: SignupPage,
+});
 
 const onboardingRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -33,6 +40,7 @@ function DashboardRoute() {
 }
 
 const routeTree = rootRoute.addChildren([
+  signupRoute,
   onboardingRoute,
   dashboardLayoutRoute.addChildren([dashboardIndexRoute]),
 ])
