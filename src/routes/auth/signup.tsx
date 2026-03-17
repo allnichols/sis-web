@@ -1,6 +1,6 @@
-import { Box, Container, TextInput, PasswordInput, Button, Stack } from '@mantine/core';
+import { Box, Container, TextInput, PasswordInput, Button, Stack, Title, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { isEmail, hasLength, useForm } from '@mantine/form';
 
 export default function SignupPage() {
@@ -16,25 +16,26 @@ export default function SignupPage() {
     validate: {
         email: isEmail('Invalid email address'),    
         password: hasLength({ min: 6 }, 'Password must be at least 6 characters long'),
-        confirm_password: (value, values) => value === values.password ? null : 'Passwords do not match',
     }
   });
 
 
   return (
-    <Container size="sm" mt="xl">
+    <Container size="xs" mt="xl">
         <Box bd={1}  style={{
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
         borderRadius: '8px',
         padding: '2rem',
         backgroundColor: '#fff',
       }}>
+        <Title order={2} style={{ textAlign: 'center' }}>Signup</Title>
             <form>
                 <Stack>
                 <TextInput 
                     label="Email"
                     key={form.key('email')}
                     {...form.getInputProps('email')}
+                    placeholder='mail@mail.com'
                 />
                 <PasswordInput
                     label="Password"
@@ -43,16 +44,10 @@ export default function SignupPage() {
                     visible={visible}
                     onVisibilityChange={toggle}
                 />
-                <PasswordInput
-                    label="Confirm Password"
-                    key={form.key('confirm_password')}
-                    {...form.getInputProps('confirm_password')}
-                    visible={visible}
-                    onVisibilityChange={toggle}
-                />
                 <Button fullWidth mt="md" onClick={() => navigate({ to: '/onboarding' })}>
                     Sign Up
                 </Button>
+                <Text>Already have an account? <Link to={"/login"}>Login</Link></Text>
                 </Stack>
             </form>
         </Box>
