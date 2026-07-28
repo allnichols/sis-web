@@ -3,6 +3,8 @@ import { Container, Button, Box, TextInput  } from '@mantine/core';
 import { isEmail, hasLength, useForm, } from '@mantine/form';
 import type { OnboardingFormValues } from '../../features/onboarding/components/types';
 
+const marginBottom = { marginBottom: '1rem' };
+
 export function OnboardingPage() {
   const navigate = useNavigate({ from: '/' });
   const form = useForm<OnboardingFormValues>({
@@ -37,7 +39,7 @@ export function OnboardingPage() {
   };
 
   return (
-    <Container size="md" mt="xl">
+    <Container size="sm" mt="xl">
       <Box bd={1}  style={{
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
         borderRadius: '8px',
@@ -50,6 +52,7 @@ export function OnboardingPage() {
           key={form.key('institution_name')}
           {...form.getInputProps('institution_name')}
           placeholder='Best School'
+          style={marginBottom}
         />
         <TextInput 
           label="Email"
@@ -57,12 +60,15 @@ export function OnboardingPage() {
           {...form.getInputProps('institution_email')}
           placeholder='example@domain.com'
           type='email'
+          style={marginBottom}
+
         />
         <TextInput
           label="Address"
           key={form.key('institution_address')}
           {...form.getInputProps('institution_address')}
           placeholder='123 Main St, City, State'
+          style={marginBottom}
         />
         <TextInput 
           label="Phone Number"
@@ -70,6 +76,7 @@ export function OnboardingPage() {
           {...form.getInputProps('institution_phone_number')}
           placeholder='(123) 456-7890'
           type='tel'
+          style={marginBottom}
         />
 
         <TextInput 
@@ -78,6 +85,7 @@ export function OnboardingPage() {
           {...form.getInputProps('admin_name')}
           description="The primary administrator for this institution"
           placeholder='John Doe'
+          style={marginBottom}
         />
         <TextInput 
           label="Admin Email"
@@ -86,6 +94,7 @@ export function OnboardingPage() {
           description="The email address for the primary administrator"
           placeholder='admin@example.com'
           type='email'
+          style={marginBottom}
         />
       <Button 
         type="submit" 

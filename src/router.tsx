@@ -3,7 +3,7 @@ import { RootLayout } from './routes/__root'
 import { OnboardingPage } from './routes/onboarding'
 import { DashboardLayout } from './routes/dashboard/layout'
 import { DashboardPage, validateDashboardSearch } from './routes/dashboard/dashboard'
-import SignupPage from './routes/auth/signup'
+import SignupPage from './routes/auth'
 
 const rootRoute = createRootRoute({ component: RootLayout })
 
