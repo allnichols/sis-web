@@ -1,48 +1,88 @@
-import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
-import { RootLayout } from './routes/__root'
-import { OnboardingPage } from './routes/onboarding'
-import { DashboardLayout } from './routes/dashboard/layout'
-import { DashboardPage, validateDashboardSearch } from './routes/dashboard/dashboard'
-import SignupPage from './routes/auth'
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+  redirect,
+} from "@tanstack/react-router";
 
-const rootRoute = createRootRoute({ component: RootLayout })
+import RootLayout from "./layouts/RootLayout";
+import { DashboardLayout } from "./layouts/DashboardLayout";
 
-const signupRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/signup',
-  component: SignupPage,
+import RegisterPage  from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
+
+import DashboardHome from "./pages/dashboard/DashboardHome";
+// import StudentsPage from "./pages/dashboard/StudentsPage";
+// import TeachersPage from "./pages/dashboard/TeachersPage";
+// import ClassesPage from "./pages/dashboard/ClassesPage";
+// import SettingsPage from "./pages/dashboard/SettingsPage";
+
+// import { getCurrentUser } from "./lib/auth";
+
+const rootRoute = createRootRoute({
+  component: RootLayout
 });
 
-const onboardingRoute = createRoute({
+// Redirect
+const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: OnboardingPage,
-})
+  beforeLoad() {
+    throw redirect({
+      to: "/register"
+    });
+  },
+});
 
-// Parent route: dashboard-specific layout
-const dashboardLayoutRoute = createRoute({
+// Public routes
+const registerRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/dashboard',
+  path: '/register',
+  component: RegisterPage
+});
+
+const loginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
+  component: LoginPage,
+});
+
+// Protected Dashboard Layout
+const dashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/dashboard",
+
+  // beforeLoad: async () => {
+  //   const user = await getCurrentUser();
+
+  //   if (!user) {
+  //     throw redirect({
+  //       to: "/login",
+  //     });
+  //   }
+  // },
+
   component: DashboardLayout,
-})
+});
 
-// Child route rendered inside <Outlet /> of DashboardLayout
 const dashboardIndexRoute = createRoute({
-  getParentRoute: () => dashboardLayoutRoute,
-  path: '/',
-  validateSearch: validateDashboardSearch,
-  component: DashboardRoute,
-})
+  getParentRoute: () => dashboardRoute,
+  path: "/",
+  component: DashboardHome,
+});
 
-function DashboardRoute() {
-  const { students } = dashboardIndexRoute.useSearch()
-  return <DashboardPage students={students} />
-}
-
+// Build tree
 const routeTree = rootRoute.addChildren([
-  signupRoute,
-  onboardingRoute,
-  dashboardLayoutRoute.addChildren([dashboardIndexRoute]),
+  indexRoute, 
+  registerRoute,
+  loginRoute,
+
+  dashboardRoute.addChildren([
+    dashboardIndexRoute,
+  ]),
 ])
 
-export const router = createRouter({ routeTree })
+export const router = createRouter({
+  routeTree,
+})

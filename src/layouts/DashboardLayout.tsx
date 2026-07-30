@@ -1,4 +1,4 @@
-import { Outlet } from '@tanstack/react-router';
+import { Outlet, Link } from '@tanstack/react-router';
 import { AppShell, Burger, Group } from '@mantine/core';
 
 import { useDisclosure } from '@mantine/hooks';
@@ -25,9 +25,11 @@ export function DashboardLayout() {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
-        You can collapse the Navbar both on desktop and mobile. After sm breakpoint, the navbar is
-        no longer offset by padding in the main element and it takes the full width of the screen
-        when opened.
+        <Link to="/dashboard">Home</Link>
+        <Link to="/dashboard/students">Students</Link>
+        <Link to="/dashboard/teachers">Students</Link>
+        <Link to="/dashboard/classes">Students</Link>
+        <Link to="/dashboard/settings">Settings</Link>
       </AppShell.Navbar>
       <AppShell.Main>
         <Outlet />

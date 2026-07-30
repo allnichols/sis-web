@@ -5,7 +5,7 @@ import type { OnboardingFormValues } from '../../features/onboarding/components/
 
 const marginBottom = { marginBottom: '1rem' };
 
-export function OnboardingPage() {
+export function RegisterPage() {
   const navigate = useNavigate({ from: '/' });
   const form = useForm<OnboardingFormValues>({
     mode: 'uncontrolled',
