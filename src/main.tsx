@@ -11,6 +11,7 @@ import App from './App'
 const theme = createTheme({
   // fontFamily: 'Open Sans, sans-serif',
   primaryColor: 'cyan',
+  fontFamily: 'Inter, sans-serif',
   components: { 
     Box: {
       styles: () => ({

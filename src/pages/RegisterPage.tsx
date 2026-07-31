@@ -1,4 +1,5 @@
+import { RegisterForm } from "../features/onboarding/components/RegisterForm"
 
 export default function RegisterPage() {
-    return <p>Register Page</p>
+    return <RegisterForm />
 }
