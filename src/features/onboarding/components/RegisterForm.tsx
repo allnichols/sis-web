@@ -1,25 +1,26 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Container, Button, Box, TextInput, Title, Divider, PasswordInput  } from "@mantine/core";
+import { useMutation } from "@tanstack/react-query";
+import { Container, Button, Box, TextInput, Title, Divider, PasswordInput } from "@mantine/core";
 import { isEmail, hasLength, useForm } from "@mantine/form";
 import { IconUserShield, IconBuilding } from "@tabler/icons-react";
 import type { OnboardingFormValues } from "./types";
 
 const textInputStyle = {
   marginBottom: "1rem",
-  borderRadious: 10,
+  borderRadius: 10,
   flexGrow: 0.5,
 };          
 
 export function RegisterForm() {
   const navigate = useNavigate({ from: "/" });
   const form = useForm<OnboardingFormValues>({
-    mode: "uncontrolled",
+    mode: "controlled",
     initialValues: {
       firstName: "",
       lastName: "",
       email: "",
       password: "",
-      schoolAdress: "",
+      schoolAddress: "",
       schoolName: "",
       schoolState: "",
       schoolZipCode: "",
@@ -27,15 +28,63 @@ export function RegisterForm() {
       schoolCountry: "",
     },
     validate: {
-      email: isEmail('Please enter a valid email')
+      email: isEmail('Please enter a valid email'),
+      password: hasLength({ min: 8 }, 'Password must be at least 8 characters long'),
+      firstName: hasLength({ min: 2 }, 'First name must be at least 2 characters long'),
+      lastName: hasLength({ min: 2 }, 'Last name must be at least 2 characters long'),
+      schoolAddress: hasLength({ min: 5 }, 'School address must be at least 5 characters long'),
+      schoolName: hasLength({ min: 2 }, 'School name must be at least 2 characters long'),
+      schoolState: hasLength({ min: 2 }, 'School state must be at least 2 characters long'),
+      schoolZipCode: hasLength({ min: 5 }, 'School zip code must be at least 5 characters long'),
+      schoolCity: hasLength({ min: 2 }, 'School city must be at least 2 characters long'),
+      schoolCountry: hasLength({ min: 2 }, 'School country must be at least 2 characters long'),
     },
   });
 
-  const submitForm = () => {
-    // Here you would typically send the form data to your backend API
-    // For this example, we'll just navigate to the dashboard
-    navigate({ to: "/dashboard" });
-  };
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: OnboardingFormValues) => {
+      const url = `${import.meta.env.VITE_API_URL_BASE}/onboarding/register`;
+      const payload = {
+        adminFirstName: values.firstName,
+        adminLastName: values.lastName,
+        adminEmail: values.email,
+        adminPassword: values.password,
+        schoolInfo: {
+          name: values.schoolName,
+          streetAddress: values.schoolAddress,
+          city: values.schoolCity,
+          state: values.schoolState,
+          zipCode: values.schoolZipCode,
+          country: values.schoolCountry,
+        },
+      };
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if(!response.ok) {
+        throw new Error("Failed to submit form");
+      }
+      console.log("Form submitted with values:", payload);
+    },
+    onSuccess: () => {
+      setTimeout(() => {
+        navigate({ to: "/dashboard" });
+      }, 2000);
+    },
+    onError: (error) => {
+      // Handle form submission error
+      console.error("Form submission error:", error);
+    }
+
+  }); 
+
+  const submitForm = () => mutate(form.values);
 
   return (
     <>
@@ -50,7 +99,7 @@ export function RegisterForm() {
       </header>
       <Container size="sm" mt="xl">
         <Box bd={1}>
-          <form onSubmit={submitForm}>
+          <form onSubmit={(e) => { e.preventDefault(); submitForm(); }}>
             <fieldset style={{ border: "none" }}>
               <legend
                 style={{
@@ -95,7 +144,7 @@ export function RegisterForm() {
               <TextInput
                 label="Email"
                 key={form.key("email")}
-                {...form.getInputProps("lastName")}
+                {...form.getInputProps("email")}
                 placeholder="johndoe@mail.com"
                 size="md"
                 radius="sm"
@@ -179,11 +228,22 @@ export function RegisterForm() {
                   style={{ marginTop: 16 }}
                 />
 
+        
                 <TextInput 
                   label="Zip Code"
-                  key={form.key("schoolZip")}
+                  key={form.key("schoolZipCode")}
                   {...form.getInputProps("schoolZipCode")}
                   placeholder="12345"
+                  size="md"
+                  radius="sm"
+                  style={{ marginTop: 16 }}
+                />
+
+                <TextInput
+                  label="Country"
+                  key={form.key("schoolCountry")}
+                  {...form.getInputProps("schoolCountry")}
+                  placeholder="United States"
                   size="md"
                   radius="sm"
                   style={{ marginTop: 16 }}
@@ -200,9 +260,10 @@ export function RegisterForm() {
               radius="sm"
               size="md"
               style={{ marginInline: 'auto', marginTop: 16, fontWeight: 'bold', display: 'block' }}
-              disabled={true}
+              disabled={!form.isValid() || isPending}
               >
-              Complete Registration
+                {isPending ? "Submitting..." : "Complete Registration"}
+             
             </Button>
           </form>
         </Box>

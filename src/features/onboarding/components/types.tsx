@@ -4,7 +4,7 @@ export type OnboardingFormValues = {
     email: string;
     password: string;
     schoolName: string;
-    schoolAdress: string;
+    schoolAddress: string;
     schoolCity: string;
     schoolCountry: string;
     schoolState: string;
