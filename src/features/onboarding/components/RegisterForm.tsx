@@ -1,17 +1,38 @@
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
-import { Container, Button, Box, TextInput, Title, Divider, PasswordInput } from "@mantine/core";
+import {
+  Container,
+  Button,
+  Group,
+  Stack,
+  Text,
+  Divider,
+  Popover,
+  TextInput,
+  PasswordInput,
+} from "@mantine/core";
 import { isEmail, hasLength, useForm } from "@mantine/form";
-import { IconUserShield, IconBuilding } from "@tabler/icons-react";
 import type { OnboardingFormValues } from "./types";
 
 const textInputStyle = {
   marginBottom: "1rem",
   borderRadius: 10,
   flexGrow: 0.5,
-};          
+};
 
 export function RegisterForm() {
+  type OverlayStatus = "loading" | "error" | "success";
+
+  const [overlay, setOverlay] = useState<{
+    visible: boolean;
+    status: OverlayStatus;
+    message: string;
+  }>({
+    visible: false,
+    status: "loading",
+    message: "Submitting registration...",
+  });
   const navigate = useNavigate({ from: "/" });
   const form = useForm<OnboardingFormValues>({
     mode: "controlled",
@@ -28,20 +49,54 @@ export function RegisterForm() {
       schoolCountry: "",
     },
     validate: {
-      email: isEmail('Please enter a valid email'),
-      password: hasLength({ min: 8 }, 'Password must be at least 8 characters long'),
-      firstName: hasLength({ min: 2 }, 'First name must be at least 2 characters long'),
-      lastName: hasLength({ min: 2 }, 'Last name must be at least 2 characters long'),
-      schoolAddress: hasLength({ min: 5 }, 'School address must be at least 5 characters long'),
-      schoolName: hasLength({ min: 2 }, 'School name must be at least 2 characters long'),
-      schoolState: hasLength({ min: 2 }, 'School state must be at least 2 characters long'),
-      schoolZipCode: hasLength({ min: 5 }, 'School zip code must be at least 5 characters long'),
-      schoolCity: hasLength({ min: 2 }, 'School city must be at least 2 characters long'),
-      schoolCountry: hasLength({ min: 2 }, 'School country must be at least 2 characters long'),
+      email: isEmail("Please enter a valid email"),
+      password: hasLength(
+        { min: 8 },
+        "Password must be at least 8 characters long",
+      ),
+      firstName: hasLength(
+        { min: 2 },
+        "First name must be at least 2 characters long",
+      ),
+      lastName: hasLength(
+        { min: 2 },
+        "Last name must be at least 2 characters long",
+      ),
+      schoolAddress: hasLength(
+        { min: 5 },
+        "School address must be at least 5 characters long",
+      ),
+      schoolName: hasLength(
+        { min: 2 },
+        "School name must be at least 2 characters long",
+      ),
+      schoolState: hasLength(
+        { min: 2 },
+        "School state must be at least 2 characters long",
+      ),
+      schoolZipCode: hasLength(
+        { min: 5 },
+        "School zip code must be at least 5 characters long",
+      ),
+      schoolCity: hasLength(
+        { min: 2 },
+        "School city must be at least 2 characters long",
+      ),
+      schoolCountry: hasLength(
+        { min: 2 },
+        "School country must be at least 2 characters long",
+      ),
     },
   });
 
   const { mutate, isPending } = useMutation({
+    onMutate: () => {
+      setOverlay({
+        visible: false,
+        status: "loading",
+        message: "Submitting registration...",
+      });
+    },
     mutationFn: async (values: OnboardingFormValues) => {
       const url = `${import.meta.env.VITE_API_URL_BASE}/onboarding/register`;
       const payload = {
@@ -67,214 +122,163 @@ export function RegisterForm() {
         body: JSON.stringify(payload),
       });
 
-      if(!response.ok) {
-        throw new Error("Failed to submit form");
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        const errorMessage =
+          data?.error || data?.message || "Failed to submit form";
+
+        throw new Error(errorMessage);
       }
-      console.log("Form submitted with values:", payload);
     },
     onSuccess: () => {
+      setOverlay({
+        visible: false,
+        status: "success",
+        message: "Registration successful. Redirecting to dashboard...",
+      });
       setTimeout(() => {
         navigate({ to: "/dashboard" });
-      }, 2000);
+      }, 3000);
     },
     onError: (error) => {
-      // Handle form submission error
-      console.error("Form submission error:", error);
-    }
-
-  }); 
+      const message =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      setOverlay({
+        visible: true,
+        status: "error",
+        message,
+      });
+      console.error("Error submitting form:", message);
+    },
+  });
 
   const submitForm = () => mutate(form.values);
+  const isFormComplete = Object.values(form.values).every(
+    (value) => value.trim().length > 0,
+  );
 
   return (
-    <>
-      <header
-        style={{
-          height: 56,
-          marginBottom: 120,
-          borderBottom: "1px solid lightgrey",
-        }}
-      >
-        <Container size="md"></Container>
-      </header>
-      <Container size="sm" mt="xl">
-        <Box bd={1}>
-          <form onSubmit={(e) => { e.preventDefault(); submitForm(); }}>
-            <fieldset style={{ border: "none" }}>
-              <legend
-                style={{
-                  border: "none",
-                  display: "flex",
-                  alignItems: "center",
-                }}
+    <Container size="sm" mt="xl">
+      <Stack gap="lg">
+        <div>
+          <Text fw={600} size="lg" mb="xs">
+            Admin info
+          </Text>
+          <Text c="dimmed" size="sm" mb="md">
+            Create an admin account
+          </Text>
+
+          <Group mt="xl" grow>
+            <TextInput
+              label="First Name"
+              placeholder="John"
+              {...form.getInputProps("firstName")}
+              style={textInputStyle}
+            />
+            <TextInput
+              label="Last Name"
+              placeholder="Doe"
+              {...form.getInputProps("lastName")}
+              style={textInputStyle}
+            />
+          </Group>
+          <TextInput
+            label="Email"
+            placeholder="mail@gmail.com"
+            {...form.getInputProps("email")}
+            style={textInputStyle}
+          />
+          <PasswordInput
+            label="Password"
+            placeholder="Password"
+            {...form.getInputProps("password")}
+            style={textInputStyle}
+          />
+        </div>
+
+        <Divider />
+
+        <div>
+          <Text fw={600} size="lg" mb="xs">
+            School info
+          </Text>
+          <Text c="dimmed" size="sm" mb="md">
+            Provide school details
+          </Text>
+
+          <TextInput
+            label="School Name"
+            placeholder="Springfield High School"
+            {...form.getInputProps("schoolName")}
+            style={textInputStyle}
+          />
+          <TextInput
+            label="School Address"
+            placeholder="123 Main St"
+            {...form.getInputProps("schoolAddress")}
+            style={textInputStyle}
+          />
+          <Group grow>
+            <TextInput
+              label="City"
+              placeholder="Springfield"
+              {...form.getInputProps("schoolCity")}
+              style={textInputStyle}
+            />
+            <TextInput
+              label="State"
+              placeholder="IL"
+              {...form.getInputProps("schoolState")}
+              style={textInputStyle}
+            />
+          </Group>
+          <Group grow>
+            <TextInput
+              label="Zip Code"
+              placeholder="62701"
+              {...form.getInputProps("schoolZipCode")}
+              style={textInputStyle}
+            />
+            <TextInput
+              label="Country"
+              placeholder="USA"
+              {...form.getInputProps("schoolCountry")}
+              style={textInputStyle}
+            />
+          </Group>
+        </div>
+
+        <Group justify="center" mt="xl">
+          <Popover
+            opened={overlay.visible && overlay.status === "error"}
+            onChange={(opened) => {
+              if (!opened) {
+                setOverlay((current) => ({ ...current, visible: false }));
+              }
+            }}
+            width={300}
+            position="top"
+            withArrow
+            shadow="md"
+          >
+            <Popover.Target>
+              <Button
+                onClick={submitForm}
+                loading={isPending}
+                disabled={!isFormComplete || isPending}
               >
-                <IconUserShield stroke={2} size={30} color="blue" />
-                <Title order={3} styles={{ root: { marginLeft: 8 } }}>
-                  Adminstrative Lead
-                </Title>
-              </legend>
-              <Box
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 40,
-                  marginTop: 16,
-                }}
-              >
-                <TextInput
-                  label="First Name"
-                  key={form.key("firstName")}
-                  {...form.getInputProps("firstName")}
-                  placeholder="John"
-                  style={textInputStyle}
-                  size="md"
-                  radius="sm"
-                />
-                <TextInput
-                  label="Last Name"
-                  key={form.key("lastName")}
-                  {...form.getInputProps("lastName")}
-                  placeholder="Doe"
-                  style={textInputStyle}
-                  size="md"
-                  radius="sm"
-                />
-              </Box>
-
-              <TextInput
-                label="Email"
-                key={form.key("email")}
-                {...form.getInputProps("email")}
-                placeholder="johndoe@mail.com"
-                size="md"
-                radius="sm"
-              />
-
-              <PasswordInput 
-                label="Password"
-                key={form.key("password")}
-                {...form.getInputProps("password")}
-                placeholder="Enter password"
-                size="md"
-                radius="sm"
-                style={{ marginTop: 16}}
-              />
-            </fieldset>
-
-           <Divider style={{ 
-              marginTop: 32, 
-              width: '50%', 
-              marginInline: 'auto'
-            }}/>
-
-            <fieldset style={{ border: "none", marginTop: 40 }}>
-              <legend
-                style={{
-                  border: "none",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <IconBuilding size={30} stroke={2} color="blue" />
-                <Title order={3} styles={{ root: { marginLeft: 8 } }}>
-                  School Information
-                </Title>
-              </legend>
-
-              <TextInput
-                label="School Name"
-                key={form.key("schoolName")}
-                {...form.getInputProps("schoolName")}
-                placeholder="Your Schools Name"
-                size="md"
-                radius="sm"
-                style={{
-                  marginTop: 16
-                }}
-              />
-
-              <TextInput
-                label="Street Address"
-                key={form.key("schoolAddress")}
-                {...form.getInputProps("schoolAddress")}
-                placeholder="123 West Street"
-                size="md"
-                radius="sm"
-                style={{
-                  marginTop: 24
-                }}
-              />
-
-              
-
-              <Box style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-                <TextInput
-                  label="City"
-                  key={form.key("schoolCity")}
-                  {...form.getInputProps("schoolCity")}
-                  placeholder="Houston"
-                  size="md"
-                  radius="sm"
-                  style={{ marginTop: 16 }}
-                />
-
-                <TextInput
-                  label="State"
-                  key={form.key("schoolState")}
-                  {...form.getInputProps("schoolState")}
-                  placeholder="Texas"
-                  size="md"
-                  radius="sm"
-                  style={{ marginTop: 16 }}
-                />
-
-        
-                <TextInput 
-                  label="Zip Code"
-                  key={form.key("schoolZipCode")}
-                  {...form.getInputProps("schoolZipCode")}
-                  placeholder="12345"
-                  size="md"
-                  radius="sm"
-                  style={{ marginTop: 16 }}
-                />
-
-                <TextInput
-                  label="Country"
-                  key={form.key("schoolCountry")}
-                  {...form.getInputProps("schoolCountry")}
-                  placeholder="United States"
-                  size="md"
-                  radius="sm"
-                  style={{ marginTop: 16 }}
-                />
-              </Box>
-
-              
-            </fieldset>
-
-            <Button 
-              type="submit" 
-              mt="lg" 
-              color="#1A5AD7" 
-              radius="sm"
-              size="md"
-              style={{ marginInline: 'auto', marginTop: 16, fontWeight: 'bold', display: 'block' }}
-              disabled={!form.isValid() || isPending}
-              >
-                {isPending ? "Submitting..." : "Complete Registration"}
-             
-            </Button>
-          </form>
-        </Box>
-      </Container>
-              <Divider style={{ marginTop: 32, marginBottom: 16, width: '50%', marginInline: 'auto'}}/>
-      <footer 
-        style={{
-          marginTop: 128
-        }}>
-
-      </footer>
-    </>
+                Register
+              </Button>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <Text size="sm" c="red">
+                {overlay.message}
+              </Text>
+            </Popover.Dropdown>
+          </Popover>
+        </Group>
+      </Stack>
+    </Container>
   );
 }
